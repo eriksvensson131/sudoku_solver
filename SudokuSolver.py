@@ -1,24 +1,21 @@
 #Importing from standard libraries
 from collections import namedtuple
 
-#Import third party libraries
+#Importing from third party libraries
 import numpy as np
 
 Pos = namedtuple('Pos', 'row col')
 
 class SudokuSolver:
 
-	def __init__(self, puzzle):
-		self.puzzle = puzzle
-		self.unsolved = [Pos(row, col) for row in range(9)
-									   for col in range(9)
-									   if puzzle[row, col] == 0]
+	def __init__(self, board):
+		self.board = board
 
-	def check_number(self, pos, n):
+	def check_number(self, board, pos, n):
 		if ( 
-			(n in self.puzzle[self.slice_row(pos)]) or
-			(n in self.puzzle[self.slice_col(pos)]) or
-			(n in self.puzzle[self.slice_square(pos)])
+			(n in board[self.slice_row(pos)]) or
+			(n in board[self.slice_col(pos)]) or
+			(n in board[self.slice_square(pos)])
 		   ):
 			return False
 		else:
@@ -35,24 +32,28 @@ class SudokuSolver:
 		square_y = pos.col // 3
 		return np.s_[square_x*3:square_x*3+3, square_y*3:square_y*3+3]
 
-	def solve(self, i, n):
-		if i < 0:
-			return 'no possible solution'
-		elif i == len(self.unsolved):
-			print(self.puzzle)
-			return 'puzzle solved'
+	def find_empty(self, board):
+	    for i in range(len(board)):
+	        for j in range(len(board[i])):
+	            if board[i][j] == 0:
+	                return i,j
+	    else:
+	        return False
+
+	def solve(self, board):
+		empty_space = self.find_empty(board)
+		if not empty_space:
+			print(board)
+			return True
 		else:
-			pos = self.unsolved[i]
-			if n == 10:
-				self.puzzle[pos] = 0
-				i -= 1
-				n = self.puzzle[self.unsolved[i]] + 1
-				return self.solve(i, n)
-			else: 
-				if self.check_number(pos, n):
-					self.puzzle[pos] = n
-					return self.solve(i+1, 1)
-				else:
-					return self.solve(i, n+1)
-			
+			pos = Pos(*empty_space)
+
+		for n in range(1,10):
+			if self.check_number(board, pos, n):
+				board[pos] = n
+				if self.solve(board):
+					return True
+				board[pos] = 0
+		else:
+			return False
 

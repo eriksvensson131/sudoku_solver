@@ -11,7 +11,5 @@ print(f'The original puzzle looks like:\n{puzzle}')
 
 ss = SudokuSolver.SudokuSolver(puzzle)
 
-print(ss.solve(0, 1))
+ss.solve(puzzle)
 
-#print(ss.puzzle)
-#print('where are we?')
