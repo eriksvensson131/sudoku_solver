@@ -1,15 +1,9 @@
 import sudoku_puzzles
 import SudokuSolver
-import numpy as np
-import sys
-sys.setrecursionlimit(20000)
 
+puzzles = sudoku_puzzles.puzzle_dict
+ss = SudokuSolver.SudokuSolver(puzzles['puzzle3'])
 
-puzzle = np.array(sudoku_puzzles.puzzle2)
-
-print(f'The original puzzle looks like:\n{puzzle}')
-
-ss = SudokuSolver.SudokuSolver(puzzle)
-
-ss.solve(puzzle)
+print(f'The original puzzle looks like:\n{ss.board}\n')
+ss.solve()
 
