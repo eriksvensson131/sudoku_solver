@@ -1,17 +1,16 @@
 # Importing from standard libraries
 from collections import namedtuple
+Pos = namedtuple('Pos', 'row col')
 
 # Importing from third party libraries
 import numpy as np
 
-Pos = namedtuple('Pos', 'row col')
-
 class SudokuSolver:
     """Solves sudokus"""
-
     def __init__(self, board):
         self.board = np.array(board)
-        self.solvedBoard = np.array(None)
+        self.solutions = []
+        self.numberOfSolutions = 0
 
     @staticmethod
     def check_number(board, pos, n):
@@ -35,29 +34,31 @@ class SudokuSolver:
             for j in range(len(board[i])):
                 if board[i][j] == 0:
                     return Pos(i, j)
-        else:
-            return False
+        return None
 
-    def solve(self):
+    def solve(self, findAll=False):
         """starts the recursion"""
-        if(self.recursive_solve(self.board)):
-            print(f'A solution was found\n{self.solvedBoard}')
-        else:
-            print('There is no solution')
+        self.recursive_solve(self.board.copy(), findAll)
+        if self.solutions:
+            print(f'The following {len(self.solutions)} solutions where found:\n')
+            for i, board in enumerate(self.solutions, 1):
+                print(f'#{i}\n{board} \n')
 
-    def recursive_solve(self, board):
-        """Solves the board recursively, updates the solvedBoard when finished"""
+    def recursive_solve(self, board, findAll=False):
+        """Solves the board recursively, updates the solvedBoard when finished.
+           If findAll flag is set to true solvedBoard will be updated to a list with
+           all solutions"""
         empty_space = self.find_empty(board)
         if not empty_space:
-            self.solvedBoard = board
-            return True
+            self.solutions.append(board.copy())
+            return not findAll #If True is returned only one solution is found
         else:
             pos = empty_space
 
         for n in range(1, 10):
             if self.check_number(board, pos, n):
                 board[pos] = n
-                if self.recursive_solve(board):
+                if self.recursive_solve(board, findAll):
                     return True
                 board[pos] = 0
         else:
