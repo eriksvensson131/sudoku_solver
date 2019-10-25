@@ -1,4 +1,4 @@
-import sudoku_puzzles
+import sudokuPuzzles
 import SudokuSolver
 import argparse
 
@@ -14,16 +14,23 @@ def str2bool(s):
 
 parser = argparse.ArgumentParser(description='Solve a sudoku')
 parser.add_argument('puzzleNumber', metavar='puzzle', type=str,
-                    help='select puzzle1, puzzle2, puzzle3 or puzzle4')
+                    help='select puzzle number or generate')
 parser.add_argument('findAll', metavar='boolean', type=str2bool, nargs='?',
                     default=False, help='look for more than one solution?')
 args = parser.parse_args()
 
-puzzles = sudoku_puzzles.puzzle_dict
-board = puzzles[args.puzzleNumber]
+puzzles = sudokuPuzzles.puzzle_dict
 findAll = args.findAll
+puzzleNumber = args.puzzleNumber
+if puzzleNumber == 'generate':
+    sudoku = SudokuSolver.Sudoku(None)
+    sudoku.show_board()
+    sudoku.solve(findAll=False)
+else:
+    board = puzzles[puzzleNumber]
+    sudoku = SudokuSolver.Sudoku(board)
+    print(f'The original puzzle looks like:\n{sudoku.board}\n')
+    sudoku.solve(findAll)
 
-ss = SudokuSolver.SudokuSolver(board)
 
-print(f'The original puzzle looks like:\n{ss.board}\n')
-ss.solve(findAll)
+
