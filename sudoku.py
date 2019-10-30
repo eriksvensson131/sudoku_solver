@@ -1,36 +1,39 @@
-import sudokuPuzzles
+import SudokuPuzzles
 import SudokuSolver
-import argparse
+import Argparser
 
-def str2bool(s):
-    if isinstance(s, bool):
-        return s
-    if s.lower() in ('yes', 'true', 't', 'y', '1'):
-        return True
-    elif s.lower() in ('no', 'false', 'f', 'n', '0'):
-        return False
+argparser = Argparser.Argparser()
+find_all = argparser.find_all
+puzzle_number = argparser.puzzle_number
+
+"""find_all = False
+puzzle_number = 'puzzle4'"""
+
+puzzles = SudokuPuzzles.puzzle_dict
+
+
+def show_solutions(solutions):
+    if solutions:
+        print(f'The following {len(solutions)} solutions where found:')
+        for i, board in enumerate(solutions, 1):
+            print(f'#{i}\n{board} \n')
     else:
-        raise argparse.ArgumentTypeError('Boolean value expected')
+        print('no possible solutions for this puzzle')
 
-parser = argparse.ArgumentParser(description='Solve a sudoku')
-parser.add_argument('puzzleNumber', metavar='puzzle', type=str,
-                    help='select puzzle number or generate')
-parser.add_argument('findAll', metavar='boolean', type=str2bool, nargs='?',
-                    default=False, help='look for more than one solution?')
-args = parser.parse_args()
 
-puzzles = sudokuPuzzles.puzzle_dict
-findAll = args.findAll
-puzzleNumber = args.puzzleNumber
-if puzzleNumber == 'generate':
+if puzzle_number == 'generate':
     sudoku = SudokuSolver.Sudoku(None)
     sudoku.show_board()
-    sudoku.solve(findAll=False)
+    sudoku.solve(find_all)
+    show_solutions(sudoku.solutions)
 else:
-    board = puzzles[puzzleNumber]
-    sudoku = SudokuSolver.Sudoku(board)
+    puzzle = puzzles[puzzle_number]
+    sudoku = SudokuSolver.Sudoku(puzzle)
     print(f'The original puzzle looks like:\n{sudoku.board}\n')
-    sudoku.solve(findAll)
+    sudoku.solve(find_all)
+    show_solutions(sudoku.solutions)
+
+
 
 
 
