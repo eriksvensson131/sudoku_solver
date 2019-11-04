@@ -1,10 +1,30 @@
 # Importing from standard libraries
 from collections import namedtuple
+import time
 
 # Importing from third party libraries
 import numpy as np
 
 Pos = namedtuple('Pos', 'row col')
+
+
+def clock(func):
+    def clocked(*args):
+        t0 = time.perf_counter()
+        result = func(*args)
+        elapsed = time.perf_counter() - t0
+        name = func.__name__
+        print(f'{elapsed:.2f}s to solve with \"{name}\"')
+        return result
+    return clocked
+
+
+"""Thoughts to be implemented:
+    1) refactor class to send less boards back and forth, change self.board directly
+    2) speed up solution by populating _empty_spaces dictionary with Pos:number of solutions
+       sort _empty_spaces by how many solutions there are. Remove enter_unequivocal when this is 
+       implemented
+    3) Make generate sudoku truly random, solve after every number is entered"""
 
 
 class Sudoku:
@@ -13,11 +33,13 @@ class Sudoku:
         self.board = self.set_board(board)
         self.solutions = []
         self.number_of_solutions = 0
+        self._empty_spaces = {}
 
     def set_board(self, board):
         """Sets the board, generates a random sudoku if board=None"""
         if board:
-            return np.array(board)
+            board = np.array(board)
+            return self.enter_unequivocal(board)
         else:
             return self.generate_sudoku()
 
@@ -45,17 +67,18 @@ class Sudoku:
                     return Pos(i, j)
         return None
 
+    @clock
     def solve(self, find_all=False):
         """starts the recursion"""
         self.solutions = []
-        board = self.solve_sure_numbers(self.board.copy())
+        board = self.board.copy()
         self.recursive_solve(board, find_all)
 
     def show_board(self):
         """Prints the current board state"""
         print(self.board)
 
-    def solve_sure_numbers(self, board):
+    def enter_unequivocal(self, board):
         """Returns a board where sure numbers are added"""
         found_new = True
         sure_numbers = 0

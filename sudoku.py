@@ -6,9 +6,6 @@ argparser = Argparser.Argparser()
 find_all = argparser.find_all
 puzzle_number = argparser.puzzle_number
 
-"""find_all = False
-puzzle_number = 'puzzle4'"""
-
 puzzles = SudokuPuzzles.puzzle_dict
 
 
