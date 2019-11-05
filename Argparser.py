@@ -5,9 +5,9 @@ class Argparser():
     def __init__(self):
         self.parser = argparse.ArgumentParser(description='Solve a sudoku')
         self.parser.add_argument('puzzle_number', metavar='puzzle', type=str,
-                            help='select puzzle number or generate')
-        self.parser.add_argument('find_all', metavar='boolean', type=self.str2bool, nargs='?',
-                            default=False, help='look for more than one solution?')
+                            help='select puzzle number or generate, e.g. \'puzzle1\'')
+        self.parser.add_argument('find_all', metavar='find_all', type=self.str2bool, nargs='?',
+                            default=False, help='look for more than one solution? Y/N')
         self.args = self.parser.parse_args()
         self.find_all = self.args.find_all
         self.puzzle_number = self.args.puzzle_number

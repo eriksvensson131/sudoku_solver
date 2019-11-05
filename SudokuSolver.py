@@ -9,6 +9,7 @@ Pos = namedtuple('Pos', 'row col')
 
 
 def clock(func):
+    """Decorator which times the time it takes for functions"""
     def clocked(*args):
         t0 = time.perf_counter()
         result = func(*args)
@@ -19,27 +20,18 @@ def clock(func):
     return clocked
 
 
-"""Thoughts to be implemented:
-    1) refactor class to send less boards back and forth, change self.board directly
-    2) speed up solution by populating _empty_spaces dictionary with Pos:number of solutions
-       sort _empty_spaces by how many solutions there are. Remove enter_unequivocal when this is 
-       implemented
-    3) Make generate sudoku truly random, solve after every number is entered"""
-
-
 class Sudoku:
     """Creates or solves sudokus"""
     def __init__(self, board=None):
         self.board = self.set_board(board)
+        self._empty_spaces = self.empty_spaces(board=self.board)
         self.solutions = []
         self.number_of_solutions = 0
-        self._empty_spaces = {}
 
     def set_board(self, board):
         """Sets the board, generates a random sudoku if board=None"""
         if board:
-            board = np.array(board)
-            return self.enter_unequivocal(board)
+            return np.array(board)
         else:
             return self.generate_sudoku()
 
@@ -67,6 +59,15 @@ class Sudoku:
                     return Pos(i, j)
         return None
 
+    def find_empty2(self, board):
+        """uses the _empty_spaces list to return an empty position with
+        the lowest possible numbers"""
+        for pos in self._empty_spaces:
+            if board[pos] == 0:
+                return pos
+        else:
+            return None
+
     @clock
     def solve(self, find_all=False):
         """starts the recursion"""
@@ -78,37 +79,31 @@ class Sudoku:
         """Prints the current board state"""
         print(self.board)
 
-    def enter_unequivocal(self, board):
-        """Returns a board where sure numbers are added"""
-        found_new = True
-        sure_numbers = 0
-        while found_new:
-            positions = [Pos(row, col) for row in range(9)
-                                       for col in range(9)
-                                       if board[row, col] == 0]
-            for pos in positions:
-                possible_numbers = []
-                for n in range(1, 10):
-                    if self.check_number(board, pos, n):
-                        possible_numbers.append(n)
-                if len(possible_numbers) == 1:
-                    board[pos] = possible_numbers[0]
-                    sure_numbers +=1
-                    found_new = True
-            else:
-                found_new = False
-        return board
+    def empty_spaces(self, board):
+        """Returns a sorted list of the empty positions on the board. The list is sorted
+        with the position having the fewest allowed possible numbers first"""
+        counting_possible_numbers = []
+        positions = [Pos(row, col) for row in range(9)
+                                   for col in range(9)
+                                   if board[row, col] == 0]
+        for pos in positions:
+            possible_numbers = 0
+            for n in range(1, 10):
+                if self.check_number(board, pos, n):
+                    possible_numbers += 1
+            counting_possible_numbers.append((pos, possible_numbers))
+        counting_possible_numbers = sorted(counting_possible_numbers, key=lambda x: x[1])
+        return [x[0] for x in counting_possible_numbers]
 
     def recursive_solve(self, board, find_all=False):
         """Solves the board recursively, updates the solvedBoard when finished.
-           If find_all flag is set to true solutions will be updated to a list with
-           all solutions"""
+           If find_all flag is set to true all possible solutions will be found"""
         empty_space = self.find_empty(board)
-        if not empty_space:
+        if not empty_space:  # base case, a filled board
             self.solutions.append(board.copy())
-            if len(self.solutions) >= 15:
-                return True  # Abort recursion if more than 15 solutions are found
-            return not find_all  # If True is returned only one solution is found
+            if len(self.solutions) >= 15:  # Abort recursion if more than 15 solutions are found
+                return True
+            return not find_all  # find_all = True will continue recursion and start backtracking
         else:
             pos = empty_space
 
@@ -122,6 +117,7 @@ class Sudoku:
             return False
 
     def generate_sudoku(self, initial_values=25):
+        """A function to generate sudokus which is not fully implemented"""
         board = np.zeros([9, 9]).astype('int')
         set_values = 0
         while set_values <= initial_values:

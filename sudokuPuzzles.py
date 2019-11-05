@@ -1,3 +1,10 @@
+"""puzzles to test current version of SudokuSolver.
+   puzzle1, puzzle2 and puzzle3 have only one solution
+   puzzle4 has no solution
+   puzzle5 has multiple solutions
+ """
+
+
 puzzle_dict = dict({'puzzle1': [[0, 0, 5, 0, 0, 0, 0, 0, 0],
                                 [0, 0, 2, 4, 0, 1, 0, 7, 0],
                                 [3, 0, 4, 0, 0, 0, 5, 6, 0],
