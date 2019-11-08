@@ -1,4 +1,4 @@
-import SudokuPuzzles
+import sudokuPuzzles
 import SudokuSolver
 import Argparser
 
@@ -6,7 +6,7 @@ argparser = Argparser.Argparser()
 find_all = argparser.find_all
 puzzle_number = argparser.puzzle_number
 
-puzzles = SudokuPuzzles.puzzle_dict
+puzzles = sudokuPuzzles.puzzle_dict
 
 
 def show_solutions(solutions):
